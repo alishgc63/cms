@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>My Blog</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+  
+  <main id="posts-container"></main>
+
+  <footer>
+    <p>&copy; 2024 My Blog</p>
+  </footer>
+
+  <script>
+    const postsContainer = document.getElementById('posts-container');
+    const posts = JSON.parse(localStorage.getItem('posts')) || [];
+
+    function displayPosts() {
+      postsContainer.innerHTML = '';
+      posts.forEach(post => {
+        const postDiv = document.createElement('div');
+        postDiv.className = 'blog-post';
+        postDiv.innerHTML = `
+          <h2>${post.title}</h2>
+          <p>${post.content.substring(0, 100)}... <a href="post.html?title=${encodeURIComponent(post.title)}">Read more</a></p>
+          <p><small>By ${post.author} on ${post.date}</small></p>
+        `;
+        postsContainer.appendChild(postDiv);
+      });
+    }
+
+    displayPosts();
+  </script>
+</body>
+</html>

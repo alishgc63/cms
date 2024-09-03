@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Blog Post</h1>
+  </header>
+  
+  <main id="post-content"></main>
+
+  <footer>
+    <p>&copy; 2024 My Blog</p>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const postTitle = params.get('title');
+    const posts = JSON.parse(localStorage.getItem('posts')) || [];
+    const post = posts.find(p => p.title === postTitle);
+
+    const postContent = document.getElementById('post-content');
+    if (post) {
+      postContent.innerHTML = `
+        <h2>${post.title}</h2>
+        <p>${post.content}</p>
+        <p><small>By ${post.author} on ${post.date}</small></p>
+      `;
+    } else {
+      postContent.innerHTML = '<p>Post not found.</p>';
+    }
+  </script>
+</body>
+</html>

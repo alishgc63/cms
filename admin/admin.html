@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- TinyMCE WYSIWYG Editor -->
+  <script src="https://cdn.tiny.cloud/1/x08lqilcm26qjtckwkmnjrb7o44hs71siwj0jggaa2egoa4u/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+<body>
+  <div class="admin-container">
+    <h1>Admin Panel</h1>
+    <form id="post-form">
+      <input type="text" id="title" placeholder="Post Title" required><br>
+      <textarea id="editor" placeholder="Start writing your post here..."></textarea><br>
+      <input type="text" id="author" placeholder="Author" required><br>
+      <input type="date" id="date" required><br>
+      <button type="submit">Save Post</button>
+    </form>
+
+    <h2>Existing Posts</h2>
+    <div id="posts-list"></div>
+  </div>
+
+  <script>
+    // Initialize TinyMCE editor
+    tinymce.init({
+      selector: '#editor',
+      height: 300,
+      plugins: 'lists link image table media',
+      toolbar: 'undo redo | formatselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table media',
+    });
+
+    // Static authentication check
+    if (!localStorage.getItem('isAuthenticated')) {
+      window.location.href = 'login.html';
+    }
+
+    const postForm = document.getElementById('post-form');
+    const postsList = document.getElementById('posts-list');
+
+    // Fetch posts from JSON or initialize an empty array
+    let posts = JSON.parse(localStorage.getItem('posts')) || [];
+
+    function displayPosts() {
+      postsList.innerHTML = '';
+      posts.forEach((post, index) => {
+        const postDiv = document.createElement('div');
+        postDiv.className = 'post-item';
+        postDiv.innerHTML = `
+          <h3>${post.title}</h3>
+          <p><small>By ${post.author} on ${post.date}</small></p>
+          <button onclick="editPost(${index})">Edit</button>
+          <button onclick="deletePost(${index})">Delete</button>
+        `;
+        postsList.appendChild(postDiv);
+      });
+    }
+
+    function deletePost(index) {
+      posts.splice(index, 1);
+      localStorage.setItem('posts', JSON.stringify(posts));
+      displayPosts();
+    }
+
+    function editPost(index) {
+      const post = posts[index];
+      document.getElementById('title').value = post.title;
+      tinymce.get('editor').setContent(post.content);
+      document.getElementById('author').value = post.author;
+      document.getElementById('date').value = post.date;
+      posts.splice(index, 1);
+    }
+
+    postForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newPost = {
+        title: document.getElementById('title').value,
+        content: tinymce.get('editor').getContent(),
+        author: document.getElementById('author').value,
+        date: document.getElementById('date').value
+      };
+      posts.push(newPost);
+      localStorage.setItem('posts', JSON.stringify(posts));
+      displayPosts();
+      postForm.reset();
+      tinymce.get('editor').setContent('');
+    });
+
+    displayPosts();
+  </script>
+</body>
+</html>
